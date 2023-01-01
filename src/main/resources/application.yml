@@ -1,5 +1,13 @@
 server:
   port: 1025
+  servlet:
+    context-path: /exam
 spring:
   application:
     name: exam
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: 5214zxc***
+    url: jdbc:postgresql://192.168.124.6/ysmir_db
+
