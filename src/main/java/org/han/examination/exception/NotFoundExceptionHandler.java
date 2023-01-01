@@ -1,6 +1,7 @@
-package org.han.examination.enumerate;
+package org.han.examination.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.han.examination.enumerate.ErrorEnum;
 import org.han.examination.result.Result;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.GetMapping;

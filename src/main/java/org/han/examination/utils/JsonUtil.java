@@ -17,4 +17,14 @@ public class JsonUtil {
         }
         return value;
     }
+
+    public <T> T deserialization(String json,Class<T> type) {
+        T t;
+        try {
+            t = objectMapper.readValue(json, type);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return t;
+    }
 }

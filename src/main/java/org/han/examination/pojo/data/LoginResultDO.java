@@ -1,13 +1,13 @@
-package org.han.examination.pojo.vo;
+package org.han.examination.pojo.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class LoginResultVO {
+public class LoginResultDO {
     private String token;
     private Integer id;
     private String username;
