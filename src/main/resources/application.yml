@@ -1,0 +1,5 @@
+server:
+  port: 1025
+spring:
+  application:
+    name: exam
