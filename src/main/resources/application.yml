@@ -6,9 +6,7 @@ spring:
   application:
     name: exam
   datasource:
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: 5214zxc***
-    url: jdbc:postgresql://192.168.124.6/ysmir_db
-
-
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/db?serverTimezone=UTC
