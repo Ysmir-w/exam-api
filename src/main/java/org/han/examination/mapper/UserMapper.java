@@ -7,7 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    @Insert("insert into users(roleid, username, userpwd, truename, classid) values (#{roleId,username,userPwd,trueName,classId})")
+    @Insert("insert into users(roleid, username, userpwd, truename, classid) values (#{roleId},#{username},#{userPwd},#{trueName},#{classId})")
     Integer addUser(UsersDO user);
 
     @Delete("delete from users where userid=#{id}")

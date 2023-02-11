@@ -19,7 +19,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.function.ServerRequest;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +77,7 @@ public class LogAspect {
         List<Object> arguments = new ArrayList<>();
 
         for (Object arg : args) {
-            if (arg instanceof ServerRequest || arg instanceof ServletResponse || arg instanceof MultipartFile) {
+            if (arg instanceof ServerRequest || arg instanceof ServletResponse || arg instanceof MultipartFile || arg instanceof HttpServletRequest) {
                 continue;
             }
             arguments.add(arg);

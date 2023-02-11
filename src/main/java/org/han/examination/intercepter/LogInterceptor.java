@@ -24,6 +24,6 @@ public class LogInterceptor implements HandlerInterceptor {
     private String getSn(HttpServletRequest request) {
         String date = formatter.format(LocalDate.now());
         String requestId = request.getRequestId();
-        return date + String.format("%010d", Integer.parseInt(requestId));
+        return date + String.format("%010d", Integer.parseInt(requestId,16));
     }
 }

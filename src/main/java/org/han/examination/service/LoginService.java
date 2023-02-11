@@ -38,4 +38,11 @@ public class LoginService {
 
         return Result.success(token);
     }
+
+    public Result<Void> logout(String username) {
+        try (Jedis jedis = jedisUtil.getJedis()){
+            jedis.del("exam:login:" + username);
+        }
+        return Result.success();
+    }
 }
