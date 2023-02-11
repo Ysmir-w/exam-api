@@ -1,0 +1,19 @@
+package org.han.examination.contoller;
+
+import jakarta.annotation.Resource;
+import org.han.examination.pojo.dto.LoginInfoDTO;
+import org.han.examination.result.Result;
+import org.han.examination.service.LoginService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class LoginController {
+    @Resource
+    private LoginService loginService;
+
+    @PostMapping("login")
+    public Result<String> login(LoginInfoDTO loginInfoDTO) {
+        return loginService.login(loginInfoDTO);
+    }
+}
