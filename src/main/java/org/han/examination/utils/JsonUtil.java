@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class JsonUtil {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public String serialization(Object object) {
+    public String serialize(Object object) {
         String value;
         try {
             value = objectMapper.writeValueAsString(object);
@@ -18,7 +18,7 @@ public class JsonUtil {
         return value;
     }
 
-    public <T> T deserialization(String json,Class<T> type) {
+    public <T> T deserialize(String json, Class<T> type) {
         T t;
         try {
             t = objectMapper.readValue(json, type);
