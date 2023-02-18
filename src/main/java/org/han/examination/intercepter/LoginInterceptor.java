@@ -20,6 +20,12 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
+
+        String method = request.getMethod();
+        if ("OPTIONS".equals(method)) {
+            return true;
+        }
+
         String username = Optional.ofNullable(request.getHeader("username")).orElseThrow(() -> new BusinessException(ErrorEnum.NO_LOGIN));
         String token = Optional.ofNullable(request.getHeader("token")).orElseThrow(() -> new BusinessException(ErrorEnum.NO_LOGIN));
         try (Jedis jedis = jedisUtil.getJedis()) {
