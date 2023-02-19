@@ -1,4 +1,4 @@
-package org.han.examination.pojo.data;
+package org.han.examination.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UsersDO {
+public class TeacherDTO {
     private Integer userId;
-    private Integer roleId;
     private String username;
-    private String userPwd;
     private String trueName;
     private Integer classId;
 }

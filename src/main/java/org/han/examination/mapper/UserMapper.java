@@ -13,7 +13,7 @@ public interface UserMapper {
     @Delete("delete from users where userid=#{id}")
     Integer deleteUser(Integer id);
 
-    @Update("update users set roleid = #{roleId}, username = #{userName}, userpwd = #{userPwd}, truename = #{trueName}, classid = #{classId} where userid = #{userId}")
+    @Update("update users set roleid = #{roleId}, username = #{username}, truename = #{trueName}, classid = #{classId} where userid = #{userId}")
     Integer updateUser(UsersDO user);
 
     @Select("select userid,roleid,username,userpwd,truename,classid from users where userid = #{id}")
@@ -22,27 +22,33 @@ public interface UserMapper {
     @Select("select userid,roleid,username,userpwd,truename,classid from users where username = #{username}")
     UsersDO getUserByUsername(String username);
 
+    @Select("select count(*) from users where username = #{username}")
+    Integer isUserExistByUsername(String username);
+
+    @Select("select count(*) from users where username = #{username} and userid != #{userId}")
+    Integer isUserExistOnUpdate(UsersDO usersDO);
+
     @Select("""
             <script>
                 select userid,roleid,username,userpwd,truename,classid from users
                 <where>
-                    <if test='userId != null'>
-                        userid=#{userId}
+                    <if test='user.userId != null'>
+                        userid=#{user.userId}
                     </if>
-                    <if test='roleId != null'>
-                        roleid=#{roleId}
+                    <if test='user.roleId != null'>
+                        roleid=#{user.roleId}
                     </if>
-                    <if test='username != null and username != ""'>
-                        username like concat('%',#{username},'%')
+                    <if test='user.username != null and user.username != ""'>
+                        username like concat('%',#{user.username},'%')
                     </if>
-                    <if test='trueName != null and trueName != ""'>
+                    <if test='user.trueName != null and user.trueName != ""'>
                         truename like concat('%',#{trueName},'%')
                     </if>
-                    <if test='classId != null and classId !=""'>
-                        classid = #{classId}
+                    <if test='user.classId != null and user.classId !=""'>
+                        classid = #{user.classId}
                     </if>
                 </where>
-                limit offset,count
+                limit #{offset},#{count}
             </script>
             """)
     List<UsersDO> getUserList(@Param("user") UsersDO user, @Param("offset") Integer offset,@Param("count") Integer count);

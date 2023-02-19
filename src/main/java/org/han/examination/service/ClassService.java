@@ -7,6 +7,7 @@ import org.han.examination.mapper.ClassMapper;
 import org.han.examination.pojo.data.ClassDO;
 import org.han.examination.pojo.dto.ClassDTO;
 import org.han.examination.pojo.vo.ClassVO;
+import org.han.examination.pojo.vo.OptionVO;
 import org.han.examination.result.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,18 @@ public class ClassService {
         Map<String, Object> result = new HashMap<>();
         result.put("count", count);
         result.put("data", classList);
+        return Result.success(result);
+    }
+
+    public Result<List<OptionVO>> getClassOptionList() {
+        List<OptionVO> result = classMapper.getAllClassList().stream()
+                .map(classDO -> {
+                    OptionVO optionVO = new OptionVO();
+                    optionVO.setLabel(classDO.getClassName());
+                    optionVO.setValue(String.valueOf(classDO.getClassId()));
+                    return optionVO;
+                })
+                .toList();
         return Result.success(result);
     }
 }

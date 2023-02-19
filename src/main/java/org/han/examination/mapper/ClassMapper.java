@@ -19,6 +19,8 @@ public interface ClassMapper {
     @Select("select classId,className from pjClass where classId = #{id}")
     ClassDO getClassById(Integer id);
 
+    @Select("select classId,className from pjClass")
+    List<ClassDO> getAllClassList();
     @Select("select classId,className from pjClass limit #{offset},#{count}")
     List<ClassDO> getClassList(Integer offset, Integer count);
 
@@ -30,4 +32,17 @@ public interface ClassMapper {
 
     @Select("select count(*) from pjClass where className = #{className} and classId != #{classId}")
     Integer isClassExistOnUpdate(ClassDO ClassDO);
+
+    @Select("""
+            <script>
+                select classId,className from pjClass
+                <where>
+                    classId in
+                    <foreach collection='idList' open='(' item='id' separator=',' close=')'>
+                        #{id}
+                    </foreach>
+                </where>
+            </script>
+            """)
+    List<ClassDO> getClassListByIdList(List<Integer> idList);
 }

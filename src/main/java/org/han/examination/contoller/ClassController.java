@@ -4,10 +4,12 @@ import jakarta.annotation.Resource;
 import org.han.examination.log.annotation.LogMarker;
 import org.han.examination.pojo.dto.ClassDTO;
 import org.han.examination.pojo.vo.ClassVO;
+import org.han.examination.pojo.vo.OptionVO;
 import org.han.examination.result.Result;
 import org.han.examination.service.ClassService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -45,5 +47,11 @@ public class ClassController {
     @LogMarker
     public Result<Map<String, Object>> getClassList(@PathVariable Integer page,@PathVariable Integer size) {
         return classService.getClassList(page, size);
+    }
+
+    @GetMapping("class/option")
+    @LogMarker
+    public Result<List<OptionVO>> getClassOptionList() {
+        return classService.getClassOptionList();
     }
 }
