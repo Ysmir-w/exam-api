@@ -33,19 +33,19 @@ public interface UserMapper {
                 select userid,roleid,username,userpwd,truename,classid from users
                 <where>
                     <if test='user.userId != null'>
-                        userid=#{user.userId}
+                        and userid=#{user.userId}
                     </if>
                     <if test='user.roleId != null'>
-                        roleid=#{user.roleId}
+                        and roleid=#{user.roleId}
                     </if>
                     <if test='user.username != null and user.username != ""'>
-                        username like concat('%',#{user.username},'%')
+                        and username like concat('%',#{user.username},'%')
                     </if>
                     <if test='user.trueName != null and user.trueName != ""'>
-                        truename like concat('%',#{trueName},'%')
+                        and truename like concat('%',#{trueName},'%')
                     </if>
                     <if test='user.classId != null and user.classId !=""'>
-                        classid = #{user.classId}
+                        and classid = #{user.classId}
                     </if>
                 </where>
                 limit #{offset},#{count}
@@ -58,19 +58,19 @@ public interface UserMapper {
                 select count(*) from users
                 <where>
                     <if test='userId != null'>
-                        userid=#{userId}
+                        and userid=#{userId}
                     </if>
                     <if test='roleId != null'>
-                        roleid=#{roleId}
+                        and roleid=#{roleId}
                     </if>
                     <if test='username != null and username != ""'>
-                        username like concat('%',#{username},'%')
+                        and username like concat('%',#{username},'%')
                     </if>
                     <if test='trueName != null and trueName != ""'>
-                        truename like concat('%',#{trueName},'%')
+                        and truename like concat('%',#{trueName},'%')
                     </if>
                     <if test='classId != null and classId !=""'>
-                        classid = #{classId}
+                        and classid = #{classId}
                     </if>
                 </where>
             </script>

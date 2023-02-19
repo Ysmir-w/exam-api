@@ -37,10 +37,12 @@ public interface ClassMapper {
             <script>
                 select classId,className from pjClass
                 <where>
-                    classId in
-                    <foreach collection='idList' open='(' item='id' separator=',' close=')'>
-                        #{id}
-                    </foreach>
+                    <if test='idList != null and idList.size() != 0'>
+                        classId in
+                        <foreach collection='idList' open='(' item='id' separator=',' close=')'>
+                            #{id}
+                        </foreach>
+                    </if>
                 </where>
             </script>
             """)

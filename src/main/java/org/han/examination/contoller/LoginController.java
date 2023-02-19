@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.han.examination.log.annotation.LogMarker;
 import org.han.examination.pojo.dto.LoginInfoDTO;
+import org.han.examination.pojo.vo.LoginVO;
 import org.han.examination.result.Result;
 import org.han.examination.service.LoginService;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class LoginController {
 
     @PostMapping("login")
     @LogMarker
-    public Result<String> login(@RequestBody LoginInfoDTO loginInfoDTO) {
+    public Result<LoginVO> login(@RequestBody LoginInfoDTO loginInfoDTO) {
         return loginService.login(loginInfoDTO);
     }
 
