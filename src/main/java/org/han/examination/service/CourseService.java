@@ -7,6 +7,7 @@ import org.han.examination.mapper.CourseMapper;
 import org.han.examination.pojo.data.CourseDO;
 import org.han.examination.pojo.dto.CourseDTO;
 import org.han.examination.pojo.vo.CourseVO;
+import org.han.examination.pojo.vo.OptionVO;
 import org.han.examination.result.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -77,5 +78,13 @@ public class CourseService {
         result.put("count", count);
         result.put("data", courseList);
         return Result.success(result);
+    }
+
+    public Result<List<OptionVO>> getClassOptionList() {
+        List<OptionVO> optionVOList = courseMapper.getCourseListAll()
+                .stream()
+                .map(courseDO -> new OptionVO(courseDO.getCname(), String.valueOf(courseDO.getCno())))
+                .toList();
+        return Result.success(optionVOList);
     }
 }

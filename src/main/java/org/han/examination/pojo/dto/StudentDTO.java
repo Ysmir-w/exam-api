@@ -11,5 +11,4 @@ public class StudentDTO {
     private Integer userId;
     private String username;
     private String trueName;
-    private Integer classId;
 }

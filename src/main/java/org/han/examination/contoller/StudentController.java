@@ -1,6 +1,7 @@
 package org.han.examination.contoller;
 
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.han.examination.log.annotation.LogMarker;
 import org.han.examination.pojo.dto.StudentDTO;
 import org.han.examination.pojo.vo.StudentVO;
@@ -17,8 +18,8 @@ public class StudentController {
 
     @LogMarker
     @PostMapping("student")
-    public Result<Void> addStudent(@RequestBody StudentDTO studentDTO) {
-        return studentService.addStudent(studentDTO);
+    public Result<Void> addStudent(@RequestBody StudentDTO studentDTO, HttpServletRequest request) {
+        return studentService.addStudent(studentDTO, getTeacherKey(request));
     }
 
     @LogMarker
@@ -29,9 +30,9 @@ public class StudentController {
 
     @LogMarker
     @PutMapping("student/{id}")
-    public Result<Void> updateStudent(@PathVariable Integer id, @RequestBody StudentDTO studentDTO) {
+    public Result<Void> updateStudent(@PathVariable Integer id, @RequestBody StudentDTO studentDTO, HttpServletRequest request) {
         studentDTO.setUserId(id);
-        return studentService.updateStudent(studentDTO);
+        return studentService.updateStudent(studentDTO, getTeacherKey(request));
     }
 
     @LogMarker
@@ -44,5 +45,11 @@ public class StudentController {
     @GetMapping("student/class/{classId}/page/{page}/size/{size}")
     public Result<Map<String, Object>> getStudentList(@PathVariable Integer page, @PathVariable Integer size, @PathVariable Integer classId) {
         return studentService.getStudentList(page, size, classId);
+    }
+
+    private String getTeacherKey(HttpServletRequest request) {
+        String key = request.getHeader("username");
+        key = "exam:login:" + key;
+        return key;
     }
 }

@@ -7,10 +7,14 @@ import org.han.examination.mapper.UserMapper;
 import org.han.examination.pojo.data.ClassDO;
 import org.han.examination.pojo.data.UsersDO;
 import org.han.examination.pojo.dto.StudentDTO;
+import org.han.examination.pojo.vo.LoginVO;
 import org.han.examination.pojo.vo.StudentVO;
 import org.han.examination.result.Result;
+import org.han.examination.utils.JedisUtil;
+import org.han.examination.utils.JsonUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,24 +26,23 @@ public class StudentService {
     private ClassMapper classMapper;
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private JedisUtil jedisUtil;
+    @Resource
+    private JsonUtil jsonUtil;
 
-    public Result<Void> addStudent(StudentDTO studentDTO) {
+    public Result<Void> addStudent(StudentDTO studentDTO,String key) {
         UsersDO usersDO = new UsersDO();
         usersDO.setUserPwd("123456");
         usersDO.setUsername(studentDTO.getUsername());
         usersDO.setTrueName(studentDTO.getTrueName());
         usersDO.setRoleId(2);
-        usersDO.setClassId(studentDTO.getClassId());
+        usersDO.setClassId(getClassId(key));
 
         Integer count = userMapper.isUserExistByUsername(studentDTO.getUsername());
         if (count > 0) {
             throw new BusinessException("该学号已存在");
         }
-        ClassDO classDO = classMapper.getClassById(usersDO.getClassId());
-        if (classDO == null) {
-            throw new BusinessException("该班级不存在");
-        }
-
         count = userMapper.addUser(usersDO);
         if (count == 0) {
             throw new BusinessException("添加失败");
@@ -59,20 +62,16 @@ public class StudentService {
         return Result.success();
     }
 
-    public Result<Void> updateStudent(StudentDTO studentDTO) {
+    public Result<Void> updateStudent(StudentDTO studentDTO, String key) {
         UsersDO usersDO = new UsersDO();
         usersDO.setUserId(studentDTO.getUserId());
         usersDO.setUsername(studentDTO.getUsername());
         usersDO.setTrueName(studentDTO.getTrueName());
-        usersDO.setClassId(studentDTO.getClassId());
-        usersDO.setRoleId(1);
+        usersDO.setClassId(getClassId(key));
+        usersDO.setRoleId(2);
         Integer count = userMapper.isUserExistOnUpdate(usersDO);
-        if(count>0)
+        if (count > 0)
             throw new BusinessException("该学号已存在");
-        ClassDO classDO = classMapper.getClassById(studentDTO.getClassId());
-        if (classDO == null) {
-            throw new BusinessException("该班级不存在");
-        }
 
         count = userMapper.updateUser(usersDO);
         if (count == 0) {
@@ -91,7 +90,7 @@ public class StudentService {
         return Result.success(studentVO);
     }
 
-    public Result<Map<String,Object>> getStudentList(Integer page, Integer size,Integer classId) {
+    public Result<Map<String, Object>> getStudentList(Integer page, Integer size, Integer classId) {
         UsersDO usersDO = new UsersDO();
         usersDO.setRoleId(2);
         usersDO.setClassId(classId);
@@ -117,5 +116,12 @@ public class StudentService {
         result.put("count", count);
         result.put("data", studentVOList);
         return Result.success(result);
+    }
+
+    private Integer getClassId(String key) {
+        try (Jedis jedis = jedisUtil.getJedis()) {
+            LoginVO loginInfo = jsonUtil.deserialize(jedis.get(key), LoginVO.class);
+            return Integer.parseInt(loginInfo.getClassId());
+        }
     }
 }

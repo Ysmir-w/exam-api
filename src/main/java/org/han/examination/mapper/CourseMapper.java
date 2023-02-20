@@ -30,4 +30,22 @@ public interface CourseMapper {
 
     @Select("select count(*) from course where cname = #{cname} and cno != #{cno}")
     Integer isCourseExistOnUpdate(CourseDO courseDO);
+
+    @Select("""
+            <script>
+                select cno,cname from course
+                <where>
+                    <if test='idList != null and idList.size() != 0'>
+                        classId in
+                        <foreach collection='idList' open='(' item='id' separator=',' close=')'>
+                            #{id}
+                        </foreach>
+                    </if>
+                </where>
+            </script>
+            """)
+    List<CourseDO> getCourseListByIdList(List<Integer> idList);
+
+    @Select("select cno,cname from course")
+    List<CourseDO> getCourseListAll();
 }

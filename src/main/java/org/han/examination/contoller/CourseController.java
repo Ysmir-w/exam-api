@@ -4,10 +4,12 @@ import jakarta.annotation.Resource;
 import org.han.examination.log.annotation.LogMarker;
 import org.han.examination.pojo.dto.CourseDTO;
 import org.han.examination.pojo.vo.CourseVO;
+import org.han.examination.pojo.vo.OptionVO;
 import org.han.examination.result.Result;
 import org.han.examination.service.CourseService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -45,5 +47,11 @@ public class CourseController {
     @LogMarker
     public Result<Map<String, Object>> getCourseList(@PathVariable Integer page,@PathVariable Integer size) {
         return courseService.getCourseList(page, size);
+    }
+
+    @GetMapping("course/option")
+    @LogMarker
+    public Result<List<OptionVO>> getCourseOptionList() {
+        return courseService.getClassOptionList();
     }
 }
