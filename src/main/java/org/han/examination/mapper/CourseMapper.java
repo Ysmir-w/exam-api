@@ -36,7 +36,7 @@ public interface CourseMapper {
                 select cno,cname from course
                 <where>
                     <if test='idList != null and idList.size() != 0'>
-                        classId in
+                        cno in
                         <foreach collection='idList' open='(' item='id' separator=',' close=')'>
                             #{id}
                         </foreach>

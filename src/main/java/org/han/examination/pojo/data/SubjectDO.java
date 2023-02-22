@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 public class SubjectDO {
     private Integer sid;
     private Integer cno;
-    private Integer sType;
-    private String sContent;
+    private Integer stype;
+    private String scontent;
     private String sa;
     private String sb;
     private String sc;
     private String sd;
-    private String sKey;
+    private String skey;
 }

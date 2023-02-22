@@ -36,7 +36,7 @@ public class SubjectService {
 
     public Result<Void> updateSubject(SubjectDTO subjectDTO) {
         SubjectDO subjectDO = new SubjectDO();
-        BeanUtils.copyProperties(subjectDTO,subjectDO);
+        BeanUtils.copyProperties(subjectDTO, subjectDO);
         Integer count = subjectMapper.updateSubject(subjectDO);
         return count != 0 ? Result.success() : Result.error();
     }
@@ -44,12 +44,13 @@ public class SubjectService {
     public Result<SubjectVO> getSubjectById(Integer id) {
         SubjectDO subjectDO = subjectMapper.getSubjectById(id);
         SubjectVO subjectVO = new SubjectVO();
-        BeanUtils.copyProperties(subjectDO,subjectVO);
+        BeanUtils.copyProperties(subjectDO, subjectVO);
+        subjectVO.setCno(String.valueOf(subjectDO.getCno()));
         return Result.success(subjectVO);
     }
 
     public Result<Map<String, Object>> getSubjectList(Integer page, Integer size, Integer sType) {
-        List<SubjectDO> subjectDOList = subjectMapper.getSubjectList((page - 1) * size, size,sType);
+        List<SubjectDO> subjectDOList = subjectMapper.getSubjectList((page - 1) * size, size, sType);
         List<Integer> cnoList = subjectDOList.stream().map(SubjectDO::getCno).toList();
         List<CourseDO> courseDOList = courseMapper.getCourseListByIdList(cnoList);
         List<SubjectVO> subjectVOList = subjectDOList
@@ -60,7 +61,7 @@ public class SubjectService {
                     for (CourseDO courseDO : courseDOList) {
                         if (subjectDO.getCno().equals(courseDO.getCno())) {
                             subjectVO.setCno(String.valueOf(subjectDO.getCno()));
-                            subjectVO.setCName(courseDO.getCname());
+                            subjectVO.setCname(courseDO.getCname());
                             break;
                         }
                     }
