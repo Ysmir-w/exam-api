@@ -24,4 +24,31 @@ public interface SubjectMapper {
 
     @Select("select count(*) from subject where stype = #{stype}")
     Integer getSubjectListCount(Integer stype);
+
+    @Select("select count(*) from subject where scontent = #{sContent}")
+    Integer isSubjectExist(String sContent);
+
+    @Select("select count(*) from subject where scontent = #{sContent} and sid != #{sid}")
+    Integer isSubjectExistOnUpdating(@Param("sid") Integer sid, @Param("sContent") String sContent);
+
+    @Select("select sid from subject where stype = #{sType}")
+    List<Integer> getSubjectIdListBySType(Integer sType);
+
+    @Select("""
+            <script>
+                select sid, cno, stype, scontent, sa, sb, sc, sd, skey from subject
+                <where>
+                    <if test='idList != null and idList.size() != 0'>
+                        sid in
+                        <foreach collection='idList' open='(' item='id' separator=',' close=')'>
+                            #{id}
+                        </foreach>
+                    </if>
+                </where>
+            </script>
+            """)
+    List<SubjectDO> getSubjectListByIdList(List<Integer> idList);
+
+
+
 }

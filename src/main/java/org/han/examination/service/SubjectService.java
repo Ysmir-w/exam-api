@@ -1,6 +1,7 @@
 package org.han.examination.service;
 
 import jakarta.annotation.Resource;
+import org.han.examination.exception.BusinessException;
 import org.han.examination.mapper.CourseMapper;
 import org.han.examination.mapper.SubjectMapper;
 import org.han.examination.pojo.data.CourseDO;
@@ -23,9 +24,13 @@ public class SubjectService {
     private SubjectMapper subjectMapper;
 
     public Result<Void> addSubject(SubjectDTO subjectDTO) {
+        Integer count = subjectMapper.isSubjectExist(subjectDTO.getScontent());
+        if (count > 0) {
+            throw new BusinessException("该题目已存在");
+        }
         SubjectDO subjectDO = new SubjectDO();
         BeanUtils.copyProperties(subjectDTO, subjectDO);
-        Integer count = subjectMapper.addSubject(subjectDO);
+        count = subjectMapper.addSubject(subjectDO);
         return count != 0 ? Result.success() : Result.error();
     }
 
@@ -35,9 +40,13 @@ public class SubjectService {
     }
 
     public Result<Void> updateSubject(SubjectDTO subjectDTO) {
+        Integer count = subjectMapper.isSubjectExistOnUpdating(subjectDTO.getSid(), subjectDTO.getScontent());
+        if (count > 0) {
+            throw new BusinessException("改题目已存在");
+        }
         SubjectDO subjectDO = new SubjectDO();
         BeanUtils.copyProperties(subjectDTO, subjectDO);
-        Integer count = subjectMapper.updateSubject(subjectDO);
+        count = subjectMapper.updateSubject(subjectDO);
         return count != 0 ? Result.success() : Result.error();
     }
 
