@@ -2,13 +2,16 @@ package org.han.examination.service;
 
 import jakarta.annotation.Resource;
 import org.han.examination.exception.BusinessException;
+import org.han.examination.mapper.CourseMapper;
 import org.han.examination.mapper.ExamMapper;
 import org.han.examination.mapper.PaperMapper;
 import org.han.examination.mapper.SubjectMapper;
+import org.han.examination.pojo.data.CourseDO;
 import org.han.examination.pojo.data.ExamDO;
 import org.han.examination.pojo.data.PaperDO;
 import org.han.examination.pojo.data.SubjectDO;
 import org.han.examination.pojo.dto.ExamDTO;
+import org.han.examination.pojo.vo.ExamVO;
 import org.han.examination.result.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -16,14 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ExamService {
 
+    private final static SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     private final static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     @Resource
     private PaperMapper paperMapper;
@@ -31,13 +32,16 @@ public class ExamService {
     private SubjectMapper subjectMapper;
     @Resource
     private ExamMapper examMapper;
+    @Resource
+    private CourseMapper courseMapper;
 
     @Transactional
     public Result<Void> addExam(ExamDTO examDTO) throws ParseException {
         Integer singleNumber = examDTO.getSingleNumber();
         Integer multipleNumber = examDTO.getMultipleNumber();
-        List<Integer> singleSubjectIdList = subjectMapper.getSubjectIdListBySType(1);
-        List<Integer> multipleSubjectIdList = subjectMapper.getSubjectIdListBySType(2);
+        Integer cno = Integer.parseInt(examDTO.getCno());
+        List<Integer> singleSubjectIdList = subjectMapper.getSubjectIdListBySTypeAndCno(1, cno);
+        List<Integer> multipleSubjectIdList = subjectMapper.getSubjectIdListBySTypeAndCno(2, cno);
         singleSubjectIdList = getRandomSubjectIdList(singleSubjectIdList, singleNumber);
         multipleSubjectIdList = getRandomSubjectIdList(multipleSubjectIdList, multipleNumber);
 
@@ -48,8 +52,8 @@ public class ExamService {
         BeanUtils.copyProperties(examDTO, examDO);
         examDO.setCno(Integer.parseInt(examDTO.getCno()));
         examDO.setClassId(Integer.parseInt(examDTO.getClassId()));
-        examDO.setExamDate(formatter.parse(examDTO.getExamDate().substring(0, 9)));
-        examDO.setExamTime(formatter.parse(examDTO.getExamTime().substring(0, 9)));
+        examDO.setExamDate(dateTimeFormatter.parse(examDTO.getExamDate()));
+        examDO.setExamTime(dateTimeFormatter.parse(examDTO.getExamTime()));
 
         Integer count = examMapper.addExam(examDO);
         if (count == 0) {
@@ -77,6 +81,38 @@ public class ExamService {
         return Result.success();
     }
 
+    public Result<List<ExamVO>> getExamList(Integer classId) {
+        List<ExamDO> examDOList = examMapper.getExamListByClassId(classId);
+        List<Integer> cnoList = examDOList.stream().map(ExamDO::getCno).toList();
+        List<CourseDO> courseList = courseMapper.getCourseListByIdList(cnoList);
+        List<ExamVO> result = examDOList.stream()
+                .map(examDO -> {
+                    ExamVO examVO = new ExamVO();
+                    BeanUtils.copyProperties(examDO, examVO);
+                    for (CourseDO courseDO : courseList) {
+                        if (courseDO.getCno().equals(examDO.getCno())) {
+                            examVO.setCname(courseDO.getCname());
+                            break;
+                        }
+                    }
+                    examVO.setExamDate(formatter.format(examDO.getExamDate()));
+                    examVO.setExamTime(formatter.format(examDO.getExamTime()));
+                    return examVO;
+                })
+                .toList();
+        return Result.success(result);
+    }
+
+    @Transactional
+    public Result<Void> deleteExam(Integer id) {
+        paperMapper.deletePaperByExamId(id);
+        Integer count = examMapper.deleteExamById(id);
+        if (count == 0) {
+            throw new BusinessException("删除失败");
+        }
+        return Result.success();
+    }
+
     private List<Integer> getRandomSubjectIdList(List<Integer> list, int n) {
         Map<Integer, String> map = new HashMap<>();
         List<Integer> news = new ArrayList<>();
@@ -93,4 +129,6 @@ public class ExamService {
             return news;
         }
     }
+
+
 }

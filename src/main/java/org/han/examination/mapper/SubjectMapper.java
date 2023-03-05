@@ -31,8 +31,8 @@ public interface SubjectMapper {
     @Select("select count(*) from subject where scontent = #{sContent} and sid != #{sid}")
     Integer isSubjectExistOnUpdating(@Param("sid") Integer sid, @Param("sContent") String sContent);
 
-    @Select("select sid from subject where stype = #{sType}")
-    List<Integer> getSubjectIdListBySType(Integer sType);
+    @Select("select sid from subject where stype = #{sType} and cno=#{cno}")
+    List<Integer> getSubjectIdListBySTypeAndCno(@Param("sType") Integer sType,@Param("cno") Integer cno);
 
     @Select("""
             <script>

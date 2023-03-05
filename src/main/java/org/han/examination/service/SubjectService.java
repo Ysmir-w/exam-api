@@ -12,6 +12,7 @@ import org.han.examination.result.Result;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ public class SubjectService {
     private SubjectMapper subjectMapper;
 
     public Result<Void> addSubject(SubjectDTO subjectDTO) {
+        if (subjectDTO.getStype() == 2) {
+            subjectDTO.setSkey(sortKeys(subjectDTO.getSkey()));
+        }
         Integer count = subjectMapper.isSubjectExist(subjectDTO.getScontent());
         if (count > 0) {
             throw new BusinessException("该题目已存在");
@@ -40,6 +44,9 @@ public class SubjectService {
     }
 
     public Result<Void> updateSubject(SubjectDTO subjectDTO) {
+        if (subjectDTO.getStype() == 2) {
+            subjectDTO.setSkey(sortKeys(subjectDTO.getSkey()));
+        }
         Integer count = subjectMapper.isSubjectExistOnUpdating(subjectDTO.getSid(), subjectDTO.getScontent());
         if (count > 0) {
             throw new BusinessException("改题目已存在");
@@ -82,5 +89,11 @@ public class SubjectService {
         result.put("count", count);
         result.put("data", subjectVOList);
         return Result.success(result);
+    }
+
+    private String sortKeys(String keys) {
+        List<String> list = Arrays.asList(keys.split(","));
+        list.sort(String::compareTo);
+        return String.join(",", list);
     }
 }

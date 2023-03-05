@@ -1,7 +1,6 @@
 package org.han.examination.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.*;
 import org.han.examination.pojo.data.PaperDO;
 
 import java.util.List;
@@ -17,4 +16,10 @@ public interface PaperMapper {
             </script>
             """)
     Integer addPaper(List<PaperDO> paperList);
+
+    @Delete("delete from paper where eid=#{id}")
+    void deletePaperByExamId(Integer id);
+
+    @Select("select pid, eid, sid, cno, stype, scontent, sa, sb, sc, sd, skey from paper where eid = #{id}")
+    List<PaperDO> getPaperListByExamId(Integer id);
 }
