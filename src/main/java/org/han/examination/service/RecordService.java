@@ -1,0 +1,93 @@
+package org.han.examination.service;
+
+import jakarta.annotation.Resource;
+import org.han.examination.exception.BusinessException;
+import org.han.examination.mapper.ExamMapper;
+import org.han.examination.mapper.PaperMapper;
+import org.han.examination.mapper.StudentExamMapper;
+import org.han.examination.mapper.StudentSubjectMapper;
+import org.han.examination.pojo.data.ExamDO;
+import org.han.examination.pojo.data.PaperDO;
+import org.han.examination.pojo.data.StudentExamDO;
+import org.han.examination.pojo.data.StudentSubjectDO;
+import org.han.examination.pojo.dto.RecordDTO;
+import org.han.examination.result.Result;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+@Service
+public class RecordService {
+    @Resource
+    private StudentExamMapper studentExamMapper;
+    @Resource
+    private StudentSubjectMapper studentSubjectMapper;
+    @Resource
+    private ExamMapper examMapper;
+    @Resource
+    private PaperMapper paperMapper;
+
+    @Transactional
+    public Result<Void> addRecord(RecordDTO recordDTO) {
+        ExamDO examDO = examMapper.getExamById(recordDTO.getEid());
+        List<PaperDO> paper = paperMapper.getPaperListByExamId(recordDTO.getEid());
+        Integer singleNumber = examDO.getSingleNumber();
+        Integer singleCore = examDO.getSingleCore();
+        Integer multipleNumber = examDO.getMultipleNumber();
+        Integer multipleCore = examDO.getMultipleCore();
+        AtomicReference<Integer> score = new AtomicReference<>(0);
+        List<StudentSubjectDO> studentSubjectDOList = recordDTO.getSubjectList().stream()
+                .map(subject -> {
+                    StudentSubjectDO studentSubjectDO = new StudentSubjectDO();
+                    for (PaperDO paperDO : paper) {
+                        if (paperDO.getSid().equals(subject.getSid())) {
+                            if (paperDO.getStype() == 1) {
+                                if (paperDO.getSkey().equals(subject.getSkey())) {
+                                    score.updateAndGet(v -> v + singleCore);
+                                }
+                            } else {
+                                List<String> list = Arrays.asList(subject.getSkey().split(","));
+                                list.sort(String::compareTo);
+                                subject.setSkey(String.join(",", list));
+                                if (paperDO.getSkey().equals(subject.getSkey())) {
+                                    score.updateAndGet(v -> v + multipleCore);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    studentSubjectDO.setStudentKey(subject.getSkey());
+                    studentSubjectDO.setEid(recordDTO.getEid());
+                    studentSubjectDO.setUserId(recordDTO.getUserId());
+                    studentSubjectDO.setSid(subject.getSid());
+                    return studentSubjectDO;
+                })
+                .toList();
+
+        StudentExamDO studentExamDO = new StudentExamDO();
+        studentExamDO.setUserId(recordDTO.getUserId());
+        studentExamDO.setEid(recordDTO.getEid());
+        studentExamDO.setScore(score.get());
+        studentExamDO.setPname(examDO.getPname());
+        studentExamDO.setZscore(singleNumber * singleCore + multipleCore * multipleNumber);
+        studentExamDO.setTjTime(new Date());
+        studentExamDO.setClassId(recordDTO.getClassId());
+        Integer count = studentExamMapper.addStudentExam(studentExamDO);
+        if (count == 0) {
+            throw new BusinessException("添加失败");
+        }
+        studentSubjectDOList.forEach(studentSubjectDO -> studentSubjectDO.setSeid(studentExamDO.getSeid()));
+        if (studentSubjectDOList.size() != 0) {
+            count = studentSubjectMapper.addStudentSubject(studentSubjectDOList);
+            if (count == 0) {
+                throw new BusinessException("添加失败");
+            }
+        }
+
+        return Result.success();
+    }
+}

@@ -28,6 +28,11 @@ public class ExamController {
         return examService.getExamList(classId);
     }
 
+    @GetMapping("exam/{id}")
+    @LogMarker
+    public Result<ExamVO> getExam(@PathVariable Integer id) {
+        return examService.getExam(id);
+    }
     @DeleteMapping("exam/{id}")
     @LogMarker
     public Result<Void> deleteExam(@PathVariable Integer id) {

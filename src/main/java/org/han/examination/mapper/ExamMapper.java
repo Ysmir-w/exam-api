@@ -14,6 +14,10 @@ public interface ExamMapper {
     @Select("select eid, pname, cno, userid, classid, singlenumber, singlecore, multiplenumber, multiplecore, examdate, examtime, testtime from exam where classId=#{id}")
     List<ExamDO> getExamListByClassId(Integer id);
 
+    @Select("select eid, pname, cno, userid, classid, singlenumber, singlecore, multiplenumber, multiplecore, examdate, examtime, testtime from exam where eid=#{id}")
+    ExamDO getExamById(Integer id);
+
     @Delete("delete from exam where eid = #{id}")
     Integer deleteExamById(Integer id);
+
 }

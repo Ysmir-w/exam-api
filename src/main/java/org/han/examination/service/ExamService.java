@@ -131,4 +131,10 @@ public class ExamService {
     }
 
 
+    public Result<ExamVO> getExam(Integer id) {
+        ExamDO examDO = examMapper.getExamById(id);
+        ExamVO examVO = new ExamVO();
+        BeanUtils.copyProperties(examDO, examVO);
+        return Result.success(examVO);
+    }
 }
