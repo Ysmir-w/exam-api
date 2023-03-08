@@ -2,19 +2,16 @@ package org.han.examination.service;
 
 import jakarta.annotation.Resource;
 import org.han.examination.exception.BusinessException;
-import org.han.examination.mapper.ExamMapper;
-import org.han.examination.mapper.PaperMapper;
-import org.han.examination.mapper.StudentExamMapper;
-import org.han.examination.mapper.StudentSubjectMapper;
-import org.han.examination.pojo.data.ExamDO;
-import org.han.examination.pojo.data.PaperDO;
-import org.han.examination.pojo.data.StudentExamDO;
-import org.han.examination.pojo.data.StudentSubjectDO;
+import org.han.examination.mapper.*;
+import org.han.examination.pojo.data.*;
 import org.han.examination.pojo.dto.RecordDTO;
+import org.han.examination.pojo.vo.StudentExamVO;
 import org.han.examination.result.Result;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +27,10 @@ public class RecordService {
     private ExamMapper examMapper;
     @Resource
     private PaperMapper paperMapper;
+    @Resource
+    private UserMapper userMapper;
+
+    private final static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Transactional
     public Result<Void> addRecord(RecordDTO recordDTO) {
@@ -89,5 +90,41 @@ public class RecordService {
         }
 
         return Result.success();
+    }
+
+    public Result<List<StudentExamVO>> getStudentRecordList(Integer id) {
+        List<StudentExamVO> studentExamVOList = studentExamMapper.getStudentExamListByUserId(id)
+                .stream()
+                .map(studentExamDO -> {
+                    StudentExamVO studentExamVO = new StudentExamVO();
+                    BeanUtils.copyProperties(studentExamDO, studentExamVO);
+                    studentExamVO.setTjTime(formatter.format(studentExamDO.getTjTime()));
+                    return studentExamVO;
+                })
+                .toList();
+        return Result.success(studentExamVOList);
+    }
+
+    public Result<List<StudentExamVO>> getStudentRecordListByClassId(Integer id) {
+        List<StudentExamDO> studentExamDOList = studentExamMapper.getStudentExamListByClassId(id);
+        List<Integer> list = studentExamDOList.stream().map(StudentExamDO::getUserId)
+                .toList();
+        List<UsersDO> userList = userMapper.getUserListByIdList(list);
+        List<StudentExamVO> result = studentExamDOList.stream()
+                .map(studentExamDO -> {
+                    StudentExamVO studentExamVO = new StudentExamVO();
+                    BeanUtils.copyProperties(studentExamDO, studentExamVO);
+                    studentExamVO.setTjTime(formatter.format(studentExamDO.getTjTime()));
+                    for (UsersDO usersDO : userList) {
+                        if (usersDO.getUserId().equals(studentExamDO.getUserId())) {
+                            studentExamVO.setUsername(usersDO.getUsername());
+                            studentExamVO.setTrueName(usersDO.getTrueName());
+                            break;
+                        }
+                    }
+                    return studentExamVO;
+                })
+                .toList();
+        return Result.success(result);
     }
 }

@@ -15,7 +15,7 @@ public class JedisUtil {
         jedisPoolConfig.setMaxIdle(10);
         jedisPoolConfig.setMinIdle(2);
         jedisPoolConfig.setMaxTotal(10);
-        String host = "192.168.167.87";
+        String host = "192.168.165.67";
         int port = 6379;
         String password = "5214zxc***";
         jedisPool = new JedisPool(jedisPoolConfig, host, port, null, password);

@@ -22,6 +22,21 @@ public interface UserMapper {
     @Select("select userid,roleid,username,userpwd,truename,classid from users where username = #{username}")
     UsersDO getUserByUsername(String username);
 
+    @Select("""
+            <script>
+                select userid,roleid,username,userpwd,truename,classid from users
+                <where>
+                    <if test='list != null and list.size() != 0'>
+                        userid in
+                        <foreach collection='list' open='(' item='id' separator=',' close=')'>
+                            #{id}
+                        </foreach>
+                    </if>
+                </where>
+            </script>
+            """)
+    List<UsersDO> getUserListByIdList(List<Integer> list);
+
     @Select("select count(*) from users where username = #{username}")
     Integer isUserExistByUsername(String username);
 

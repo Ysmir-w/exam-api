@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.han.examination.log.annotation.LogMarker;
 import org.han.examination.pojo.dto.LoginInfoDTO;
+import org.han.examination.pojo.dto.PasswordDTO;
 import org.han.examination.pojo.vo.LoginVO;
 import org.han.examination.result.Result;
 import org.han.examination.service.LoginService;
@@ -27,9 +28,10 @@ public class LoginController {
         return loginService.logout(username);
     }
 
-    @GetMapping("hello")
+    @PutMapping("password")
     @LogMarker
-    public Result<String> sayHello() {
-        return Result.success("hello world");
+    public Result<Void> updatePassword(HttpServletRequest request,@RequestBody PasswordDTO passwordDTO) {
+        String username = request.getHeader("username");
+        return loginService.updatePassword(username,passwordDTO);
     }
 }

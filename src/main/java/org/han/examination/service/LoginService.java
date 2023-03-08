@@ -7,6 +7,7 @@ import org.han.examination.mapper.UserMapper;
 import org.han.examination.pojo.data.ClassDO;
 import org.han.examination.pojo.data.UsersDO;
 import org.han.examination.pojo.dto.LoginInfoDTO;
+import org.han.examination.pojo.dto.PasswordDTO;
 import org.han.examination.pojo.vo.LoginVO;
 import org.han.examination.result.Result;
 import org.han.examination.utils.JedisUtil;
@@ -51,7 +52,7 @@ public class LoginService {
         loginVO.setClassId(String.valueOf(classDO.getClassId()));
         loginVO.setRoleId(String.valueOf(usersDO.getRoleId()));
         try (Jedis jedis = jedisUtil.getJedis()) {
-            jedis.setex("exam:login:" +loginInfo.getUsername() , 600, jsonUtil.serialize(loginVO));
+            jedis.setex("exam:login:" + loginInfo.getUsername(), 600, jsonUtil.serialize(loginVO));
         }
 
         return Result.success(loginVO);
@@ -60,6 +61,19 @@ public class LoginService {
     public Result<Void> logout(String username) {
         try (Jedis jedis = jedisUtil.getJedis()) {
             jedis.del("exam:login:" + username);
+        }
+        return Result.success();
+    }
+
+    public Result<Void> updatePassword(String username, PasswordDTO passwordDTO) {
+        UsersDO usersDO = Optional.ofNullable(userMapper.getUserByUsername(username)).orElseThrow(() -> new BusinessException("密码错误"));
+        if (!usersDO.getUserPwd().equals(passwordDTO.getOldPassword())) {
+            throw new BusinessException("密码错误");
+        }
+        usersDO.setUserPwd(passwordDTO.getNewPassword());
+        Integer count = userMapper.updateUser(usersDO);
+        if (count == 0) {
+            throw new BusinessException("修改失败");
         }
         return Result.success();
     }

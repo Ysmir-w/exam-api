@@ -22,5 +22,5 @@ public interface StudentSubjectMapper {
     Integer addStudentSubject(List<StudentSubjectDO> list);
 
     @Select("select ssid,seid,userid,eid,sid,studentkey from studentsubject where userid=#{userId} and examId=#{examId}")
-    Integer getStudentSubjectByUserIdAndExamId(@Param("userId") Integer userId, @Param("examId") Integer examId);
+    List<StudentSubjectDO> getStudentSubjectByUserIdAndExamId(@Param("userId") Integer userId, @Param("examId") Integer examId);
 }
