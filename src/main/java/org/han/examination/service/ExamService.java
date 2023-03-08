@@ -2,10 +2,7 @@ package org.han.examination.service;
 
 import jakarta.annotation.Resource;
 import org.han.examination.exception.BusinessException;
-import org.han.examination.mapper.CourseMapper;
-import org.han.examination.mapper.ExamMapper;
-import org.han.examination.mapper.PaperMapper;
-import org.han.examination.mapper.SubjectMapper;
+import org.han.examination.mapper.*;
 import org.han.examination.pojo.data.CourseDO;
 import org.han.examination.pojo.data.ExamDO;
 import org.han.examination.pojo.data.PaperDO;
@@ -34,6 +31,8 @@ public class ExamService {
     private ExamMapper examMapper;
     @Resource
     private CourseMapper courseMapper;
+    @Resource
+    private StudentExamMapper studentExamMapper;
 
     @Transactional
     public Result<Void> addExam(ExamDTO examDTO) throws ParseException {
@@ -136,5 +135,27 @@ public class ExamService {
         ExamVO examVO = new ExamVO();
         BeanUtils.copyProperties(examDO, examVO);
         return Result.success(examVO);
+    }
+
+    public Result<Void> getStatus(Integer eid, Integer userid) {
+        ExamDO examDO = examMapper.getExamById(eid);
+        Date startDate = examDO.getExamDate();
+        Date endDate = examDO.getExamTime();
+        endDate.setTime(endDate.getTime() + 1000 * 60 * 60 * 24);
+        Date date = new Date();
+        System.out.println(startDate);
+        System.out.println(endDate);
+        System.out.println(date);
+        if (date.before(startDate)) {
+            throw new BusinessException("考试未开始");
+        }
+        if (date.after(endDate)) {
+            throw new BusinessException("考试已结束");
+        }
+        Integer count = studentExamMapper.isStudentExamExist(userid, eid);
+        if (count != 0) {
+            throw new BusinessException("您已考过试");
+        }
+        return Result.success();
     }
 }

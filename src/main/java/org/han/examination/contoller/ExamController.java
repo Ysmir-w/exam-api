@@ -38,4 +38,10 @@ public class ExamController {
     public Result<Void> deleteExam(@PathVariable Integer id) {
         return examService.deleteExam(id);
     }
+
+    @GetMapping("exam/{eid}/user/{userid}/status")
+    @LogMarker
+    public Result<Void> getStudentExamStatus(@PathVariable Integer eid, @PathVariable Integer userid) {
+        return examService.getStatus(eid,userid);
+    }
 }
